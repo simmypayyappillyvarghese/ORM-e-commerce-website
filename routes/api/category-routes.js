@@ -63,8 +63,8 @@ router.put('/:id', async (req, res) => {
       }
     });
   
-    if(!categoryData){
-      return res.status(404).json({message:"Failed To update the data"});
+    if(categoryData==0){
+      return res.status(404).json({message:"No data found to update"});
     }
     return res.status(200).json(categoryData);
   }
@@ -72,8 +72,19 @@ router.put('/:id', async (req, res) => {
 
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   // delete a category by its `id` value
+  try{
+  const categoryData=await Category.destroy({
+    where:{id:req.params.id}
+  });
+
+  if(categoryData==0){
+    return res.status(404).json({message:"No data found to delete"});
+  }
+  return res.status(200).json(categoryData);
+}
+catch(e){console.log(e)}
 });
 
 module.exports = router;

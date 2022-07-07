@@ -85,6 +85,8 @@ router.put('/:id', (req, res) => {
     })
     .then((productTags) => {
       // get list of current tag_ids
+      //ProductTags is an array of objects with property tag_id and product_id
+      //const productTagIds = productTags.map((productTag) => productTag.tag_id);
       const productTagIds = productTags.map(({ tag_id }) => tag_id);
       // create filtered list of new tag_ids
       const newProductTags = req.body.tagIds
@@ -95,7 +97,7 @@ router.put('/:id', (req, res) => {
             tag_id,
           };
         });
-      // figure out which ones to remove
+      // figure out which ones to remove,fetch ids of the product tag table whose tag ids are not in req.body
       const productTagsToRemove = productTags
         .filter(({ tag_id }) => !req.body.tagIds.includes(tag_id))
         .map(({ id }) => id);
@@ -113,8 +115,20 @@ router.put('/:id', (req, res) => {
     });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id',async (req, res) => {
   // delete one product by its `id` value
+try{
+  const productData=await Product.destroy({
+    where:{id:req.params.id}
+  })
+
+  if(!productData){
+    return res.status(404).json({message:"No product Data Found"});
+  }
+  return res.status(200).json(productData);
+}
+catch(e){console.log(e)}
+
 });
 
 module.exports = router;
